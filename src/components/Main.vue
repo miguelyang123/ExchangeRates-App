@@ -16,74 +16,77 @@ export default {
       rateDataList: [],
       rateList: {},
       loadedState: false,
+      exchangeRateApiUrl: import.meta.env.VITE_EXCHANGE_RATE_API_URL,
+      countryFlagApiUrl: import.meta.env.VITE_COUNTRY_FLAG_API_URL,
     };
   },
   methods: {
     async exChange(num, from, to) {
       try {
-      const res = await fetch(
-        import.meta.env.VUE_APP_EXCHANGE_RATE_API_URL + from
-      );
-      const data = await res.json();
+        const res = await fetch(this.exchangeRateApiUrl + from);
+        const data = await res.json();
 
-      // this.rateDataList = Object.keys(data.rates);
+        // this.rateDataList = Object.keys(data.rates);
 
-      const rates = data.rates[to];
+        const rates = data.rates[to];
 
-      // console.log(num * rates);
-      return num * rates;
-
-    } catch (err) {
+        // console.log(num * rates);
+        return num * rates;
+      } catch (err) {
         if (err instanceof SyntaxError) {
-          console.log('fetch出現語法錯誤', err);
-          } else {
-          console.log('fetch發生錯誤', err);
-          }
+          console.log("exChange fetch網址語法錯誤: ", err);
+        } else {
+          console.log("exChange fetch發生錯誤: ", err);
+        }
       }
     },
     async getAllRateData() {
       try {
-        const res = await fetch(
-          import.meta.env.VUE_APP_COUNTRY_FLAG_API_URL + "USD"
-        );
+        const res = await fetch(this.exchangeRateApiUrl + "USD");
         const data = await res.json();
 
         //EX: [{key:"USD", img:"https://flag..."},{}...]
         for (const key of Object.keys(data.rates)) {
-            // not find flag: SLE XDR HRK 
-            let removeKeys = ["SLE","XDR","HRK"]
-            if(removeKeys.some(rk => rk === key )) continue;
+          // not find flag: SLE XDR HRK
+          let removeKeys = ["SLE", "XDR", "HRK"];
+          if (removeKeys.some((rk) => rk === key)) continue;
 
-            const img = await this.getFlag(key);
+          const img = await this.getFlag(key);
 
-            this.rateDataList.push({key,img});
+          this.rateDataList.push({ key, img });
         }
 
         this.loadedState = true;
       } catch (err) {
         if (err instanceof SyntaxError) {
-          console.log('fetch出現語法錯誤', err);
-          } else {
-          console.log('fetch發生錯誤', err);
-          }
+          console.log("getAllRateData fetch網址語法錯誤: ", err);
+        } else {
+          console.log("getAllRateData fetch發生錯誤: ", err);
+        }
       }
     },
     async getFlag(key) {
       let dataIndex = 0;
       switch (key) {
         case "USD":
-        dataIndex= 3
+          dataIndex = 3;
           break;
       }
 
-      const URL = import.meta.env.VITE_COUNTRY_FLAG_API_URL + key
+      const URL = this.countryFlagApiUrl + key;
 
-      const res = await fetch(URL);
-      const data = await res.json();
+      try {
+        const res = await fetch(URL);
+        const data = await res.json();
 
-
-      
-      return data[dataIndex].flags.png;
+        return data[dataIndex].flags.png;
+      } catch (err) {
+        if (err instanceof SyntaxError) {
+          console.log("getFlag fetch網址語法錯誤: ", err);
+        } else {
+          console.log("getFlag fetch發生錯誤: ", err);
+        }
+      }
     },
     toFixedNum(num) {
       return Number.parseFloat(num).toFixed(2);
@@ -130,7 +133,10 @@ export default {
     // input to rateDataList
     this.getAllRateData();
     //defaultList
-    this.otherCurrencyList = this.defaultList.map((d) => ({ code: d, value: 0 }));
+    this.otherCurrencyList = this.defaultList.map((d) => ({
+      code: d,
+      value: 0,
+    }));
   },
   watch: {
     toValue() {
@@ -147,7 +153,7 @@ export default {
       :exChange="exChange"
       :toFixedNum="toFixedNum"
       :rateDataList="rateDataList"
-      :loadedState = "loadedState"
+      :loadedState="loadedState"
       @changeToValue="changeToValue"
       @changeToCode="changeToCode"
     />
