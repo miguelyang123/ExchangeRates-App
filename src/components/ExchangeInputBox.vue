@@ -8,7 +8,7 @@ export default {
     SwitchButton,
     SelectCurrencyInput,
   },
-  props: ["exChange", "toFixedNum", "rateKeyList"],
+  props: ["exChange", "toFixedNum", "rateDataList","loadedState"],
   data() {
     return {
       toInputValue: null,
@@ -105,9 +105,10 @@ export default {
         />
         <SelectCurrencyInput
           id="amountSelect"
-          :rateKeyList="rateKeyList"
+          :rateDataList="rateDataList"
           :value="toSelectValue"
           :onChange="toSelectChange"
+          :loadedState="loadedState"
         />
       </div>
       <!-- switch button -->
@@ -122,9 +123,10 @@ export default {
         />
         <SelectCurrencyInput
           id="toRatesSelect"
-          :rateKeyList="rateKeyList"
+          :rateDataList="rateDataList"
           :value="fromSelectValue"
           :onChange="fromSelectChange"
+          :loadedState="loadedState"
         />
       </div>
     </div>

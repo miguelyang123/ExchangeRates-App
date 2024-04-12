@@ -3,7 +3,7 @@ export default {
   props: [
     "toValue",
     "toCode",
-    "rateKeyList",
+    "rateDataList",
     "otherCurrencyList",
     "onDeleteList",
     "selectedAddOne",
@@ -73,8 +73,8 @@ export default {
       >
         <option selected value="default">增加幣別</option>
 
-        <option v-for="(code, index) in rateKeyList" :key="index" :value="code">
-          {{ code }}
+        <option v-for="({key}, index) in rateDataList" :key="index" :value="key">
+          {{ key }}
         </option>
         <!-- <option value="USD">United States</option> -->
       </select>
