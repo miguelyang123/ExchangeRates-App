@@ -20,8 +20,9 @@ export default {
   },
   methods: {
     async exChange(num, from, to) {
+      try {
       const res = await fetch(
-        import.meta.env.VITE_EXCHANGE_RATE_API_URL + from
+        import.meta.env.VUE_APP_EXCHANGE_RATE_API_URL + from
       );
       const data = await res.json();
 
@@ -31,11 +32,19 @@ export default {
 
       // console.log(num * rates);
       return num * rates;
+
+    } catch (err) {
+        if (err instanceof SyntaxError) {
+          console.log('fetch出現語法錯誤', err);
+          } else {
+          console.log('fetch發生錯誤', err);
+          }
+      }
     },
     async getAllRateData() {
       try {
         const res = await fetch(
-          import.meta.env.VITE_EXCHANGE_RATE_API_URL + "USD"
+          import.meta.env.VUE_APP_COUNTRY_FLAG_API_URL + "USD"
         );
         const data = await res.json();
 
@@ -52,7 +61,11 @@ export default {
 
         this.loadedState = true;
       } catch (err) {
-        console.log(err);
+        if (err instanceof SyntaxError) {
+          console.log('fetch出現語法錯誤', err);
+          } else {
+          console.log('fetch發生錯誤', err);
+          }
       }
     },
     async getFlag(key) {
