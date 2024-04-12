@@ -1,41 +1,31 @@
 <script>
 export default {
-  props: ["id", "rateKeyList", "value", "onChange"],
+  props: ["id", "rateDataList", "value", "onChange", "loadedState"],
   inject: [],
   data() {
     return {
       isOpen: false,
       // value: "USD",
+      tempImg: "",
     };
   },
   methods: {
     onOpen() {
       this.isOpen = !this.isOpen;
     },
-    // onSelected(name) {
-    //   this.value = name;
-    // },
-    getCountriesIconUrl(str) {
-      let substrStr = str.substr(0, 2);
-      switch (str) {
-        case "XAF":
-          substrStr = "TD";
-          break;
-        case "XCD":
-          substrStr = "VC";
-        case "XDR":
-          return "https://www.crwflags.com/fotw/images/i/int-imf.gif";
-        case "XOF":
-          substrStr = "TG";
-          break;
-        case "XPF":
-          substrStr = "PF";
-          break;
-      }
-      return `https://www.countryflagicons.com/FLAT/64/${substrStr}.png`;
-    },
+    onSelected(key,img){
+      this.onChange(key);
+      this.tempImg = img;
+    }
   },
-  mounted() {},
+  watch: {
+    loadedState() {
+      const rateObj = this.rateDataList.find(obj => obj.key === this.value);
+      this.tempImg = rateObj.img;
+    }
+  },
+  mounted() {
+  },
 };
 </script>
 
@@ -47,7 +37,7 @@ export default {
     >
       <div class="select-btn flex justify-between items-center">
         <div>
-          <img class="h-6 inline mr-3" :src="getCountriesIconUrl(value)" />
+          <img class="h-6 inline mr-3" :src="tempImg" />
           <span class="sBtn-text">{{ value }}</span>
         </div>
         <i class="fa-solid fa-caret-down mr-2" v-if="!isOpen"></i>
@@ -60,12 +50,13 @@ export default {
         <ul class="options overflow-auto max-h-60">
           <li
             class="option p-2.5 rounded-lg hover:bg-slate-200 cursor-pointer"
-            @click="onChange(name)"
-            v-for="(name, index) in rateKeyList"
+            @click="onSelected(key,img)"
+            v-for="({key,img}, index) in rateDataList"
             :key="index"
           >
-            <img class="w-6 inline mr-3" :src="getCountriesIconUrl(name)" />
-            <span class="option-text">{{ name }}</span>
+            <!-- <img class="w-6 inline mr-3" :src="getCountriesIconUrl(key)" /> -->
+            <img class="w-6 inline mr-3" :src="img" />
+            <span class="option-text">{{ key }}</span>
           </li>
         </ul>
       </div>

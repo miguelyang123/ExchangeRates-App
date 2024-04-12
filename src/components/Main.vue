@@ -11,39 +11,69 @@ export default {
     return {
       toValue: null,
       toCode: "JPY",
+      defaultList: ["USD", "HKD", "GBP", "CAD"],
       otherCurrencyList: [],
-      rateKeyList: [],
+      rateDataList: [],
+      rateList: {},
+      loadedState: false,
     };
   },
   methods: {
     async exChange(num, from, to) {
       const res = await fetch(
-        `https://open.exchangerate-api.com/v6/latest/${from}`
+        import.meta.env.VITE_EXCHANGE_RATE_API_URL + from
       );
       const data = await res.json();
 
-      this.rateKeyList = Object.keys(data.rates);
+      // this.rateDataList = Object.keys(data.rates);
 
       const rates = data.rates[to];
 
       // console.log(num * rates);
       return num * rates;
     },
-    async getAllRateKey() {
+    async getAllRateData() {
       try {
         const res = await fetch(
-          `https://open.exchangerate-api.com/v6/latest/USD`
+          import.meta.env.VITE_EXCHANGE_RATE_API_URL + "USD"
         );
         const data = await res.json();
-        this.rateKeyList = Object.keys(data.rates);
+
+        //EX: [{key:"USD", img:"https://flag..."},{}...]
+        for (const key of Object.keys(data.rates)) {
+            // not find flag: SLE XDR HRK 
+            let removeKeys = ["SLE","XDR","HRK"]
+            if(removeKeys.some(rk => rk === key )) continue;
+
+            const img = await this.getFlag(key);
+
+            this.rateDataList.push({key,img});
+        }
+
+        this.loadedState = true;
       } catch (err) {
         console.log(err);
       }
     },
+    async getFlag(key) {
+      let dataIndex = 0;
+      switch (key) {
+        case "USD":
+        dataIndex= 3
+          break;
+      }
+
+      const URL = import.meta.env.VITE_COUNTRY_FLAG_API_URL + key
+
+      const res = await fetch(URL);
+      const data = await res.json();
+
+
+      
+      return data[dataIndex].flags.png;
+    },
     toFixedNum(num) {
-      // console.log(num.tofixed(2));
       return Number.parseFloat(num).toFixed(2);
-      // return "123";
     },
     changeToValue(v) {
       this.toValue = +v;
@@ -84,11 +114,10 @@ export default {
     },
   },
   mounted() {
-    // input to rateKeyList
-    this.getAllRateKey();
+    // input to rateDataList
+    this.getAllRateData();
     //defaultList
-    const defaultList = ["USD", "HKD", "GBP", "CAD"];
-    this.otherCurrencyList = defaultList.map((d) => ({ code: d, value: 0 }));
+    this.otherCurrencyList = this.defaultList.map((d) => ({ code: d, value: 0 }));
   },
   watch: {
     toValue() {
@@ -104,7 +133,8 @@ export default {
     <ExchangeInputBox
       :exChange="exChange"
       :toFixedNum="toFixedNum"
-      :rateKeyList="rateKeyList"
+      :rateDataList="rateDataList"
+      :loadedState = "loadedState"
       @changeToValue="changeToValue"
       @changeToCode="changeToCode"
     />
@@ -113,7 +143,7 @@ export default {
     <OtherCurrencyBox
       :toValue="toValue"
       :toCode="toCode"
-      :rateKeyList="rateKeyList"
+      :rateDataList="rateDataList"
       :otherCurrencyList="otherCurrencyList"
       :onDeleteList="onDeleteList"
       :selectedAddOne="selectedAddOne"
