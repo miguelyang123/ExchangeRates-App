@@ -16,15 +16,23 @@ export default {
     onSelected(key,img){
       this.onChange(key);
       this.tempImg = img;
-    }
-  },
-  watch: {
-    loadedState() {
+    },
+    setImg(){
       const rateObj = this.rateDataList.find(obj => obj.key === this.value);
       this.tempImg = rateObj.img;
     }
   },
+  watch: {
+    loadedState() {
+      this.setImg();
+    },
+    value(){
+      this.setImg();
+    }
+  },
   mounted() {
+
+
   },
 };
 </script>
