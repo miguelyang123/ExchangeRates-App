@@ -1,11 +1,13 @@
 <script>
 import ExchangeInputBox from "./ExchangeInputBox.vue";
 import OtherCurrencyBox from "./OtherCurrencyBox.vue";
+import CalculatorBox from "./CalculatorBox.vue";
 
 export default {
   components: {
     ExchangeInputBox,
     OtherCurrencyBox,
+    CalculatorBox
   },
   data() {
     return {
@@ -16,6 +18,7 @@ export default {
       rateDataList: [],
       rateList: {},
       loadedState: false,
+      setToInputValue: null,
       exchangeRateApiUrl: import.meta.env.VITE_EXCHANGE_RATE_API_URL,
       countryFlagApiUrl: import.meta.env.VITE_COUNTRY_FLAG_API_URL,
     };
@@ -128,6 +131,9 @@ export default {
       });
       this.changeAllOtherValue();
     },
+    setCalculatorValueToFrom(v){
+      this.setToInputValue = v;
+    }
   },
   mounted() {
     // input to rateDataList
@@ -148,12 +154,15 @@ export default {
 
 <template>
   <main class="h-[75%] flex justify-center flex-wrap p-7">
+    <CalculatorBox @setCalculatorValueToFrom="setCalculatorValueToFrom"/>
+
     <!-- Exchange Input -->
     <ExchangeInputBox
       :exChange="exChange"
       :toFixedNum="toFixedNum"
       :rateDataList="rateDataList"
       :loadedState="loadedState"
+      :setToInputValue="setToInputValue"
       @changeToValue="changeToValue"
       @changeToCode="changeToCode"
     />
