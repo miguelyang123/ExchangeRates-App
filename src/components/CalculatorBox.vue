@@ -151,7 +151,8 @@ export default {
             arr.push(data[i + 2]);
             //push last
             if (i === formulaData.length - 4) {
-              calculateArr.push(data[i + 3]);
+              let lastNum = +withoutCommas(data[i + 3]);
+              calculateArr.push(lastNum);
             }
             temp = 0;
             i += 4;
@@ -167,7 +168,6 @@ export default {
         switch (nowStr) {
           case "×":
             // console.log("Is ×");
-
             // calculate
             if (temp) {
               temp = temp * afterNum;
@@ -245,7 +245,6 @@ export default {
       formulaData.push("=");
 
       // console.log(sum);
-      // to three decimal places
       sum = this.round(sum);
       this.numData = numberWithCommas(sum);
       // set value to from input
@@ -326,23 +325,65 @@ export default {
         this.onClickNum(obj);
         getByIdChangeBgcolor("Num" + event.key);
       }
+
+      this.handleCopyAndPasteKey(event);
     },
+
+    async handleCopyAndPasteKey(event){
+        // console.log(event.key)
+        // Ctrl c or v
+        if (event.ctrlKey && (event.key.toLowerCase() === 'c')) {
+            // Copy input
+            try {
+                await navigator.clipboard.writeText(this.numData);
+            } catch (err) {
+                console.error('The text cannot be copied to the clipboard:', err);
+            }
+        } else if (event.ctrlKey && (event.key.toLowerCase() === 'v')) {
+        // Paste
+        const clipboardText = await navigator.clipboard.readText();
+        const lastOne = this.formulaData[this.formulaData.length - 1]
+            console.log(clipboardText)
+            console.log(this.isValidNumber(clipboardText))
+            if(this.isValidNumber(clipboardText)){
+                const numStr = this.numberWithCommas(clipboardText);
+                const num = numStr
+                this.numData = num;
+                // paste to last one
+                if(this.isValidNumber(lastOne)) {
+                    this.formulaData[this.formulaData.length - 1] = num;
+                } else if(lastOne === "="){
+                    this.formulaData = [num]
+                } 
+                else {
+                    this.formulaData.push(num);
+                }
+            }
+        }
+    },
+
     numberWithCommas(x) {
       return x.toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ",");
     },
     withoutCommas(x) {
       return x.toString().replaceAll(",", "");
     },
+    isValidNumber(input) {
+        // Trimming leading and trailing spaces from a string
+        let trimmedInput = input.trim()
+        //allow "1,234.567" ...
+        const pattern = /^\d+([,.]?\d+)*$/;
+        return pattern.test(trimmedInput);
+    },
     round(num) {
-        let m = Number((Math.abs(num) * 1000).toPrecision(15));
-        return Math.round(m) / 1000 * Math.sign(num);
+        // to five decimal places
+        let m = Number((Math.abs(num) * 100000).toPrecision(15));
+        return Math.round(m) / 100000 * Math.sign(num);
     },
     setClickIsCalculatorBox(e) {
-    // 獲取點擊到的元素
     const clickedElement = e.target;
-    // 獲取指定的父層元素
     const calculatorBox = document.getElementById('calculatorBox');
-    // 檢查點擊的元素是否是指定元素的後代元素
+    // click Element is in div has id='calculatorBox'
     this.isFocused = calculatorBox.contains(clickedElement)
     },
   },
