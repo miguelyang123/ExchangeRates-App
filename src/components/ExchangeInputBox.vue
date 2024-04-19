@@ -8,7 +8,7 @@ export default {
     SwitchButton,
     SelectCurrencyInput,
   },
-  props: ["exChange", "toFixedNum", "rateDataList","loadedState"],
+  props: ["exChange", "toFixedNum", "rateDataList", "loadedState", "setToInputValue"],
   data() {
     return {
       toInputValue: null,
@@ -83,6 +83,9 @@ export default {
         this.numClass = ["inline", "text-7xl"];
       }
     },
+    setToInputValue(v){
+      this.changeToInputValue(v);
+    }
   },
 };
 </script>
