@@ -343,8 +343,8 @@ export default {
         // Paste
         const clipboardText = await navigator.clipboard.readText();
         const lastOne = this.formulaData[this.formulaData.length - 1]
-            console.log(clipboardText)
-            console.log(this.isValidNumber(clipboardText))
+            // console.log(clipboardText)
+            // console.log(this.isValidNumber(clipboardText))
             if(this.isValidNumber(clipboardText)){
                 const numStr = this.numberWithCommas(clipboardText);
                 const num = numStr
